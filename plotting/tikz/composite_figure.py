@@ -9,6 +9,15 @@ Each of these two figures is loaded from a pdf file.
 
 The method is based on LaTeX and TikZ.
 
+Notes:
+------
+
+i) On purpose, the method proposed here does not implement any rescaling of the involved figures (though this would be easy). This enforces a clean workflow where all figure components are prepared in exactly the size (figure dimensions, fon sizes, etc) needed for the final figure.
+
+ii) The position of the external figure within the composite figure needs to be specified by the user by setting the parameter pos_ext_figure in create_composite_figure(). 
+
+iii) For the master figure, a repositionig is not needed (and not implemented here): As the maser figure defines the overall layout of the final composite figure, the composite figure inherits figure dimensions from the master figure. The master figure is therefore positioned in the center of the composite figure.
+
 (Tom Tetzlaff, t.tetzlaff@fz-juelich.de, 2020)
 
 '''
@@ -109,7 +118,7 @@ def create_composite_figure(composite_figure_name_root,master_file_name,ext_file
     composite_figure_name_root: str
                                 File name root of resulting composite figure
     
-    master_file_name:              str
+    master_file_name:           str
                                 File name of master figure
 
     ext_file_name:              str
@@ -185,7 +194,7 @@ composite_figure_name_root = 'composite_example'
 ## name of external pdf file
 ext_file_name = 'inkscape_sketch.pdf'  ## here: created using inkscape
 
-## generate composite figure 
+## generate composite figure (with dimensions inherited from the master figure)
 pos_ext_file = (-3.7,2.5)      ## position of external file in composite figure (center = (0,0)
 create_composite_figure(composite_figure_name_root,master_file_name,ext_file_name,pos_ext_file)
     
