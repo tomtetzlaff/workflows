@@ -12,7 +12,7 @@ The method is based on LaTeX and TikZ.
 Notes:
 ------
 
-i) On purpose, the method proposed here does not implement any rescaling of the involved figures (though this would be easy). This enforces a clean workflow where all figure components are prepared in exactly the size (figure dimensions, fon sizes, etc) needed for the final figure.
+i) On purpose, the method proposed here does not implement any rescaling of the involved figures (though this would be easy). This enforces a clean workflow where all figure components are prepared in exactly the size (figure dimensions, font sizes, etc) needed for the final figure.
 
 ii) The position of the external figure within the composite figure needs to be specified by the user by setting the parameter pos_ext_figure in create_composite_figure(). 
 
@@ -109,7 +109,7 @@ def some_matplotlib_figure():
     return fname, fig_size
 
 #####################################
-def create_composite_figure(composite_figure_name_root,master_file_name,ext_file_name,pos_ext_file = (0,0),draw_grid = False):
+def create_composite_figure(composite_figure_name_root,master_file_name,ext_file_name,pos_ext_figure = (0,0),draw_grid = False):
     '''
     Creates a composite figure composed of a master figure and an external figure, both availabe as pdf files. The resulting file is saved in pdf format.
 
@@ -124,11 +124,11 @@ def create_composite_figure(composite_figure_name_root,master_file_name,ext_file
     ext_file_name:              str
                                 File name of external figure
 
-    pos_ext_file:               tuple
-                                Position of external figure within the composite figure (center=(0,0))
+    pos_ext_figure:             tuple
+                                Position of external figure within the composite figure (the master figure is always centered at position (0,0)).
 
     draw_grid:                  bool
-                                if True, draws some grid lines to assist positioning of external figure
+                                if True: draws some grid lines to assist positioning of external figure
 
     Returns:
     --------
@@ -161,7 +161,7 @@ def create_composite_figure(composite_figure_name_root,master_file_name,ext_file
     file.write("\n")
     file.write(r"    {\includegraphics{%s}};" % (master_file_name))
     file.write("\n")
-    file.write(r"    \node[inner sep=-1pt,rectangle] (inkscape_sketch) at (%.4f,%.4f)" % (pos_ext_file[0],pos_ext_file[1]))
+    file.write(r"    \node[inner sep=-1pt,rectangle] (inkscape_sketch) at (%.4f,%.4f)" % (pos_ext_figure[0],pos_ext_figure[1]))
     file.write("\n")
     file.write(r"    {\includegraphics{%s}};" % (ext_file_name))
     file.write("\n")
@@ -195,6 +195,6 @@ composite_figure_name_root = 'composite_example'
 ext_file_name = 'inkscape_sketch.pdf'  ## here: created using inkscape
 
 ## generate composite figure (with dimensions inherited from the master figure)
-pos_ext_file = (-3.7,2.5)      ## position of external file in composite figure (center = (0,0)
-create_composite_figure(composite_figure_name_root,master_file_name,ext_file_name,pos_ext_file)
+pos_ext_figure = (-3.7,2.5)      ## position of external file in composite figure (center = (0,0)
+create_composite_figure(composite_figure_name_root,master_file_name,ext_file_name,pos_ext_figure)
     
