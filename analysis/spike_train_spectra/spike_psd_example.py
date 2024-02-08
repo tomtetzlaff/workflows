@@ -240,6 +240,42 @@ def spike_time_list_2_gdf(spike_trains):
      return times, senders
 
 ###########################################################################################
+def psd_gamma_process_theoretical(freqs,rate,order):
+     '''
+     Theoretical power spectrum of a homogeneous Gamma process with integer order gamma
+     (see, e.g., eqs.(3.11) and (3.12) in [1]).
+     
+     [1] Tetzlaff et al. (2008). Dependence of neuronal correlations on filter characteristics 
+         and marginal spike train statistics. Neural Computation, 20(9), 2133-2184.
+
+     Parameters:
+     -----------
+
+     freqs:        ndarray(float)
+                   Array of frequencies (Hz)
+
+     rate:         float
+                   Rate of the Gamma process (1/s)
+
+     order:        int
+                   Order of the Gamma process
+
+     Returns:
+     --------
+     P:            ndarray(float)
+                   Power spectrum (1/s)/
+
+     '''
+
+     ## characteristic function (Fourier transform) of interval density
+     P1 = (order * rate / (order*rate + 2.j*numpy.pi*freqs))**order  
+
+     ## power spectrum (of a renewal process)
+     P = rate * numpy.real(( (1-P1)**(-1) + (1-numpy.conjugate(P1))**(-1) - 1.0 ))
+
+     return P
+
+###########################################################################################
 def example():
      '''
      Example demonstrating how to calculate spike power spectra using the Welch method.
@@ -272,9 +308,11 @@ def example():
      t_start        = 1.                   ## observation start time (s)
      t_stop         = 11.                  ## observation stop time (s)
      binsize        = 2e-3                 ## bin size for generating spike counts (s)
-     windowlength   = (t_stop-t_start)/5.  ## length of each segment during psd calculation (s)
-     windowlength_c = (t_stop-t_start)/5.  ## length of each segment during compound psd calculation (s)
+     windowlength   = (t_stop-t_start)/10. ## length of each segment during psd calculation (s)
+     windowlength_c = (t_stop-t_start)/10. ## length of each segment during compound psd calculation (s)
 
+     df_theo = 0.1                         ## frequency resolution for theoretcial spectrum (Hz)
+     
      ####################################################
      
      ## creating example spike trains
@@ -288,10 +326,17 @@ def example():
           P += P_buf
      P /= size
 
+     ## theoretical spectrum of the gamma process
+     freqs_theo = numpy.arange(fmin,fmax+df_theo,df_theo)
+     P_theo = psd_gamma_process_theoretical(freqs_theo,rate,order)
+     
      ## power spectrum of compound process
      compound_spike_train = numpy.sort(numpy.concatenate(spike_trains))     
      P_c,freqs_c,fmin_c,fmax_c = spike_psd(compound_spike_train, t_start, t_stop, binsize, windowlength_c)
 
+     ## theoretical spectrum of superposition of uncorrelated gamma processes
+     P_c_theo = size * P_theo
+      
      print()
      print("minimal frequency = %.3f Hz" % fmin)
      print("maximal frequency = %.3f Hz" % fmax)
@@ -318,8 +363,8 @@ def example():
      plt.subplot(311)
      times, senders = spike_time_list_2_gdf(spike_trains)
      plt.plot(times, senders, 'ko', ms=1, mfc='k', mew = 0, alpha=0.5, rasterized=True)
-     plt.vlines(t_start, 0,size, color = '0.8', ls = '--', lw = 2)
-     plt.vlines(t_stop, 0,size, color = '0.8', ls = '--', lw = 2)
+     plt.vlines(t_start, 0,size, color = '0.5', ls = '--', lw = 2)
+     plt.vlines(t_stop, 0,size, color = '0.5', ls = '--', lw = 2)
      plt.text(t_start,-0.05*size,r'$t_\mathsf{start}$', horizontalalignment='center', verticalalignment='center')
      plt.text(t_stop,-0.05*size,r'$t_\mathsf{stop}$', horizontalalignment='center', verticalalignment='center')
      plt.xlim(0,duration)
@@ -333,7 +378,9 @@ def example():
      ### ensemble averaged PSD
 
      plt.subplot(312)
-     plt.plot(freqs,P,'k',lw=2)
+     plt.plot(freqs,P          ,   'k', lw=2,            label=r'empirical')
+     plt.plot(freqs_theo,P_theo,   '0.5', lw=4, alpha=0.6, label=r'theoretical')
+     plt.legend(loc=1)
      plt.xlabel(r'frequency $f$ (Hz)')
      plt.ylabel(r'spike-train PSD (1/s)')
      plt.xlim((fmin,10*rate))
@@ -342,7 +389,9 @@ def example():
      ### compound PSD
 
      plt.subplot(313)
-     plt.plot(freqs_c,P_c,'k',lw=2)
+     plt.plot(freqs_c,P_c,         'k', lw=2,            label=r'empirical')
+     plt.plot(freqs_theo,P_c_theo, '0.5', lw=4, alpha=0.6, label=r'theoretical')
+     plt.legend(loc=1)
      plt.xlabel(r'frequency $f$ (Hz)')
      plt.ylabel(r'spike-train PSD (1/s)')
      plt.xlim((fmin,10*rate))
