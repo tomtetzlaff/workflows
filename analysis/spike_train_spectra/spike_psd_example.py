@@ -300,7 +300,7 @@ def example():
      ## spike-train parameters
      size           = 100                  ## number of spikes trains
      rate           = 10.0                 ## spike rate (spikes/s)
-     order          = 20                   ## order of gamma process (int)
+     order          = 50                   ## order of gamma process (int)
      duration       = 12.                  ## total duration of spike trains (s)
      seed           = 123                  ## rng seed for generation of spike trains
 
@@ -308,8 +308,8 @@ def example():
      t_start        = 1.                   ## observation start time (s)
      t_stop         = 11.                  ## observation stop time (s)
      binsize        = 2e-3                 ## bin size for generating spike counts (s)
-     windowlength   = (t_stop-t_start)/10. ## length of each segment during psd calculation (s)
-     windowlength_c = (t_stop-t_start)/10. ## length of each segment during compound psd calculation (s)
+     windowlength   = (t_stop-t_start)/5. ## length of each segment during psd calculation (s)
+     windowlength_c = (t_stop-t_start)/5. ## length of each segment during compound psd calculation (s)
 
      df_theo = 0.1                         ## frequency resolution for theoretcial spectrum (Hz)
      
@@ -327,7 +327,7 @@ def example():
      P /= size
 
      ## theoretical spectrum of the gamma process
-     freqs_theo = numpy.arange(fmin,fmax+df_theo,df_theo)
+     freqs_theo = numpy.arange(fmin,fmax+df_theo,df_theo)     
      P_theo = psd_gamma_process_theoretical(freqs_theo,rate,order)
      
      ## power spectrum of compound process
@@ -379,7 +379,7 @@ def example():
 
      plt.subplot(312)
      plt.plot(freqs,P          ,   'k', lw=2,            label=r'empirical')
-     plt.plot(freqs_theo,P_theo,   '0.5', lw=4, alpha=0.6, label=r'theoretical')
+     plt.plot(freqs_theo,P_theo,   '0.5', lw=3, alpha=0.6, label=r'theoretical')
      plt.legend(loc=1)
      plt.xlabel(r'frequency $f$ (Hz)')
      plt.ylabel(r'spike-train PSD (1/s)')
@@ -390,7 +390,7 @@ def example():
 
      plt.subplot(313)
      plt.plot(freqs_c,P_c,         'k', lw=2,            label=r'empirical')
-     plt.plot(freqs_theo,P_c_theo, '0.5', lw=4, alpha=0.6, label=r'theoretical')
+     plt.plot(freqs_theo,P_c_theo, '0.5', lw=3, alpha=0.6, label=r'theoretical')
      plt.legend(loc=1)
      plt.xlabel(r'frequency $f$ (Hz)')
      plt.ylabel(r'spike-train PSD (1/s)')
