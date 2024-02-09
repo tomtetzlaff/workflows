@@ -298,7 +298,7 @@ def example():
 
      ####################################################
      ## spike-train parameters
-     size           = 100                  ## number of spikes trains
+     size           = 10000                  ## number of spikes trains
      rate           = 10.0                 ## spike rate (spikes/s)
      order          = 50                   ## order of gamma process (int)
      duration       = 12.                  ## total duration of spike trains (s)
@@ -308,8 +308,8 @@ def example():
      t_start        = 1.                   ## observation start time (s)
      t_stop         = 11.                  ## observation stop time (s)
      binsize        = 2e-3                 ## bin size for generating spike counts (s)
-     windowlength   = (t_stop-t_start)/5. ## length of each segment during psd calculation (s)
-     windowlength_c = (t_stop-t_start)/5. ## length of each segment during compound psd calculation (s)
+     windowlength   = (t_stop-t_start)/5.  ## length of each segment during psd calculation (s)
+     windowlength_c = (t_stop-t_start)/5.  ## length of each segment during compound psd calculation (s)
 
      df_theo = 0.1                         ## frequency resolution for theoretcial spectrum (Hz)
      
@@ -362,7 +362,7 @@ def example():
 
      plt.subplot(311)
      times, senders = spike_time_list_2_gdf(spike_trains)
-     plt.plot(times, senders, 'ko', ms=1, mfc='k', mew = 0, alpha=0.5, rasterized=True)
+     plt.plot(times, senders, 'k.', ms=1, mfc='k', mew = 0, alpha=0.1, rasterized=True)
      plt.vlines(t_start, 0,size, color = '0.5', ls = '--', lw = 2)
      plt.vlines(t_stop, 0,size, color = '0.5', ls = '--', lw = 2)
      plt.text(t_start,-0.05*size,r'$t_\mathsf{start}$', horizontalalignment='center', verticalalignment='center')
@@ -398,7 +398,7 @@ def example():
      plt.title(r'\parbox{\linewidth}{\centering Power spectrum of compound process\\[0.5ex] \tiny $t_\mathsf{start}=%.1f$\,s, $t_\mathsf{stop}=%.1f$\,s, bin size: %.1f\,ms, window length: %.1f\,s, $f_\mathsf{min}=%.1f$\,Hz, $f_\mathsf{max}=%.1f$\,Hz}' % \
                (t_start, t_stop, binsize*1e3, windowlength,fmin_c,fmax_c))
 
-     plt.subplots_adjust(left=0.12,right=0.95,bottom=0.05,top=0.93,hspace=0.45)
+     plt.subplots_adjust(left=0.13,right=0.95,bottom=0.05,top=0.93,hspace=0.45)
 
      plt.savefig("spike_psd.pdf")
 
