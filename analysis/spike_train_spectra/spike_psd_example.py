@@ -49,7 +49,8 @@ def create_gamma_point_proc_realisation(rate,order,duration):
      The pdf of these sums is a Gamma distribution of integer order k (aka Erlangian distribution; 
      see, e.g., Sec.2.2. eq. (10), in [1]). The rate of the resulting decimated process is r.
 
-     [1] Cox, D. R., & Lewis, P. A. (1966). The statistical analysis of series of events. Springer Dordrecht
+     [1] Cox, D. R., & Lewis, P. A. (1966). The statistical analysis of series of events. 
+         Springer Dordrecht
 
      Parameters:
      -----------
@@ -243,9 +244,12 @@ def spike_time_list_2_gdf(spike_trains):
 def psd_gamma_process_theoretical(freqs,rate,order):
      '''
      Theoretical power spectrum of a homogeneous Gamma process with integer order gamma
-     (see, e.g., eqs.(3.11) and (3.12) in [1]).
+     (see, e.g., [1] or eqs.(3.11) and (3.12) in [2]).
      
-     [1] Tetzlaff et al. (2008). Dependence of neuronal correlations on filter characteristics 
+     [1] Cox, D. R., & Lewis, P. A. (1966). The statistical analysis of series of events. 
+         Springer Dordrecht
+
+     [2] Tetzlaff et al. (2008). Dependence of neuronal correlations on filter characteristics 
          and marginal spike train statistics. Neural Computation, 20(9), 2133-2184.
 
      Parameters:
@@ -263,7 +267,7 @@ def psd_gamma_process_theoretical(freqs,rate,order):
      Returns:
      --------
      P:            ndarray(float)
-                   Power spectrum (1/s)/
+                   Power spectrum (1/s)
 
      '''
 
@@ -274,6 +278,50 @@ def psd_gamma_process_theoretical(freqs,rate,order):
      P = rate * numpy.real(( (1-P1)**(-1) + (1-numpy.conjugate(P1))**(-1) - 1.0 ))
 
      return P
+
+###########################################################################################
+def psd_sd_theoretical_welch(P,T,windowlength):
+     '''
+     Theoretical standard deviation of the point process spectrum
+     estimated by the Welch method with non-overlapping segments.
+
+     The standard deviation SD of a stochastic process spectrum 
+     is identical to its expectation P(f) (for sufficiently large frequencies f; 
+     see [1], or eq. (12.46) in [2]). Using the Welch method, this error is reduced 
+     by averaging across N segments. The total error is hence given by 
+
+                  SD(f) = P(f) / sqrt(N)
+   
+     For non-overlappig segments, N=T/windowlength.
+
+     [1] Cox, D. R., & Lewis, P. A. (1966). The statistical analysis of series of events. 
+         Springer Dordrecht
+
+     [2] Papoulis, A., & Pillai, S. Unnikrishna (2002). 
+         Probability, random variables and stochastic processes. 
+         McGraw-Hill. Boston. 4th edition.
+
+     Parameters:
+     -----------
+     P:            ndarray(float)
+                   (Expected) power spectrum
+
+     T:            float
+                   Total observation duration (s)
+
+     windowlength: float
+                   Length of each segment (s)
+
+     Returns:
+     --------
+     P_sd:         ndarray(float)
+                   Standard deviation of the power spectrum
+
+     '''
+     
+     P_sd = P / numpy.sqrt(T/windowlength)
+     
+     return P_sd
 
 ###########################################################################################
 def example():
@@ -298,37 +346,47 @@ def example():
 
      ####################################################
      ## spike-train parameters
-     size           = 10000                  ## number of spikes trains
+     size           = 1000                 ## number of spikes trains
      rate           = 10.0                 ## spike rate (spikes/s)
      order          = 50                   ## order of gamma process (int)
-     duration       = 12.                  ## total duration of spike trains (s)
      seed           = 123                  ## rng seed for generation of spike trains
 
      ## analysis parameters
      t_start        = 1.                   ## observation start time (s)
-     t_stop         = 11.                  ## observation stop time (s)
+     T              = 10.                  ## observation duration (s) 
      binsize        = 2e-3                 ## bin size for generating spike counts (s)
-     windowlength   = (t_stop-t_start)/5.  ## length of each segment during psd calculation (s)
-     windowlength_c = (t_stop-t_start)/5.  ## length of each segment during compound psd calculation (s)
+     windowlength   = T/5.                 ## length of each segment during psd calculation (s)
+     windowlength_c = T/5.                 ## length of each segment during compound psd calculation (s)
 
      df_theo = 0.1                         ## frequency resolution for theoretcial spectrum (Hz)
-     
+
      ####################################################
+     duration       = T + t_start + 1.     ## total duration of spike trains (s)     
+     t_stop         = T + t_start          ## observation stop time (s)
+     
      
      ## creating example spike trains
      numpy.random.seed(seed)
      spike_trains = create_gamma_point_proc(rate,order,duration, size)
 
      ## population averaged power spectrum
-     P = 0
+     P_buf,freqs,fmin,fmax = spike_psd(spike_trains[0], t_start, t_stop, binsize, windowlength)
+     P_trial = numpy.zeros((size,len(P_buf)))
      for i in range(size):
-          P_buf,freqs,fmin,fmax = spike_psd(spike_trains[i], t_start, t_stop, binsize, windowlength)
-          P += P_buf
-     P /= size
+          P_trial[i,:],freqs,fmin,fmax = spike_psd(spike_trains[i], t_start, t_stop, binsize, windowlength)
+
+     P = numpy.mean(P_trial,axis=0)    ## trial average
+     P_sd = numpy.std(P_trial,axis=0)  ## sd across trials
+     # P = 0
+     # for i in range(size):
+     #      P_buf,freqs,fmin,fmax = spike_psd(spike_trains[i], t_start, t_stop, binsize, windowlength)
+     #      P += P_buf
+     # P /= size
 
      ## theoretical spectrum of the gamma process
      freqs_theo = numpy.arange(fmin,fmax+df_theo,df_theo)     
-     P_theo = psd_gamma_process_theoretical(freqs_theo,rate,order)
+     P_theo     = psd_gamma_process_theoretical(freqs_theo,rate,order)
+     P_theo_sd  = psd_sd_theoretical_welch(P_theo,T,windowlength)
      
      ## power spectrum of compound process
      compound_spike_train = numpy.sort(numpy.concatenate(spike_trains))     
@@ -336,7 +394,8 @@ def example():
 
      ## theoretical spectrum of superposition of uncorrelated gamma processes
      P_c_theo = size * P_theo
-      
+     P_c_theo_sd  = psd_sd_theoretical_welch(P_c_theo,T,windowlength_c)
+     
      print()
      print("minimal frequency = %.3f Hz" % fmin)
      print("maximal frequency = %.3f Hz" % fmax)
@@ -359,12 +418,11 @@ def example():
      plt.clf()
 
      ### raster plot
-
      plt.subplot(311)
      times, senders = spike_time_list_2_gdf(spike_trains)
-     plt.plot(times, senders, 'k.', ms=1, mfc='k', mew = 0, alpha=0.1, rasterized=True)
-     plt.vlines(t_start, 0,size, color = '0.5', ls = '--', lw = 2)
-     plt.vlines(t_stop, 0,size, color = '0.5', ls = '--', lw = 2)
+     plt.plot(times, senders, 'k.', ms=1, mfc='k', mew = 0, alpha=1.0, rasterized=True)
+     plt.vlines(t_start, 0, size, color = 'k', ls = '--', lw = 2)
+     plt.vlines(t_stop , 0, size, color = 'k', ls = '--', lw = 2)
      plt.text(t_start,-0.05*size,r'$t_\mathsf{start}$', horizontalalignment='center', verticalalignment='center')
      plt.text(t_stop,-0.05*size,r'$t_\mathsf{stop}$', horizontalalignment='center', verticalalignment='center')
      plt.xlim(0,duration)
@@ -376,28 +434,40 @@ def example():
      plt.title(r'\parbox{\linewidth}{\centering Ensemble of Gamma point-process realisations\\[0.5ex] \tiny rate: %.1f\,spikes/s, order: %d, duration: %.1f\,s, size: %d}' % (rate, order, duration, size))
 
      ### ensemble averaged PSD
-
      plt.subplot(312)
-     plt.plot(freqs,P          ,   'k', lw=2,            label=r'empirical')
-     plt.plot(freqs_theo,P_theo,   '0.5', lw=3, alpha=0.6, label=r'theoretical')
+     plt.plot(freqs,P_trial[0],'-',lw=0.5,color='0.6',label=r'single trials')
+     for i in range(size):
+          plt.plot(freqs,P_trial[i],'-',lw=0.5, zorder = 1, color='0.6')
+     plt.plot(freqs,P          ,   'k', lw=2, zorder = 3,            label=r'empirical trial average')
+     plt.plot(freqs,P+P_sd     ,   'k--', lw=1, zorder = 3,          label=r'empirical trial average $\pm$ s.d.')
+     plt.plot(freqs,P-P_sd     ,   'k--', lw=1, zorder = 3)         
+     plt.plot(freqs_theo,P_theo,   'r', lw=3, zorder = 2, alpha=0.6, label=r'theoretical expectation')
+     plt.plot(freqs_theo,P_theo + P_theo_sd,'r--', lw=1, zorder = 2, alpha=0.6, label=r'theoretical expectation $\pm$ s.d. (Welch)')
+     plt.plot(freqs_theo,P_theo - P_theo_sd,'r--', lw=1, zorder = 2, alpha=0.6)          
      plt.legend(loc=1)
      plt.xlabel(r'frequency $f$ (Hz)')
      plt.ylabel(r'spike-train PSD (1/s)')
      plt.xlim((fmin,10*rate))
      plt.title(r'\parbox{\linewidth}{\centering Ensemble averaged power spectrum\\[0.5ex] \tiny $t_\mathsf{start}= %.1f$\,s, $t_\mathsf{stop}= %.1f$\,s, bin size: %.1f\,ms, window length: %.1f\,s, $f_\mathsf{min}=%.1f$\,Hz, $f_\mathsf{max}=%.1f$\,Hz}' % (t_start, t_stop, binsize*1e3, windowlength,fmin,fmax))
-
+     #plt.setp(plt.gca(),xscale='log')
+     #plt.setp(plt.gca(),yscale='log')     
+     
      ### compound PSD
 
      plt.subplot(313)
-     plt.plot(freqs_c,P_c,         'k', lw=2,            label=r'empirical')
-     plt.plot(freqs_theo,P_c_theo, '0.5', lw=3, alpha=0.6, label=r'theoretical')
+     plt.plot(freqs_c,P_c,         'k', lw=2, zorder = 2,            label=r'empirical')
+     plt.plot(freqs_theo,P_c_theo, 'r', lw=3, zorder = 1, alpha=0.6, label=r'theoretical expectation')
+     plt.plot(freqs_theo,P_c_theo + P_c_theo_sd,'r--', lw=1, zorder = 1, alpha=0.6, label=r'theoretical expectation $\pm$ s.d. (Welch)')
+     plt.plot(freqs_theo,P_c_theo - P_c_theo_sd,'r--', lw=1, zorder = 1, alpha=0.6)          
      plt.legend(loc=1)
      plt.xlabel(r'frequency $f$ (Hz)')
      plt.ylabel(r'spike-train PSD (1/s)')
      plt.xlim((fmin,10*rate))
      plt.title(r'\parbox{\linewidth}{\centering Power spectrum of compound process\\[0.5ex] \tiny $t_\mathsf{start}=%.1f$\,s, $t_\mathsf{stop}=%.1f$\,s, bin size: %.1f\,ms, window length: %.1f\,s, $f_\mathsf{min}=%.1f$\,Hz, $f_\mathsf{max}=%.1f$\,Hz}' % \
                (t_start, t_stop, binsize*1e3, windowlength,fmin_c,fmax_c))
-
+     #plt.setp(plt.gca(),xscale='log')
+     #plt.setp(plt.gca(),yscale='log')     
+     
      plt.subplots_adjust(left=0.13,right=0.95,bottom=0.05,top=0.93,hspace=0.45)
 
      plt.savefig("spike_psd.pdf")
