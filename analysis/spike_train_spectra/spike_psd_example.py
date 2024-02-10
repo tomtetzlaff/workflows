@@ -377,11 +377,6 @@ def example():
 
      P = numpy.mean(P_trial,axis=0)    ## trial average
      P_sd = numpy.std(P_trial,axis=0)  ## sd across trials
-     # P = 0
-     # for i in range(size):
-     #      P_buf,freqs,fmin,fmax = spike_psd(spike_trains[i], t_start, t_stop, binsize, windowlength)
-     #      P += P_buf
-     # P /= size
 
      ## theoretical spectrum of the gamma process
      freqs_theo = numpy.arange(fmin,fmax+df_theo,df_theo)     
@@ -435,15 +430,15 @@ def example():
 
      ### ensemble averaged PSD
      plt.subplot(312)
-     plt.plot(freqs,P_trial[0],'-',lw=0.5,color='0.6',label=r'single trials')
+     plt.plot(freqs,P_trial[0],'-',lw=0.5,color='0.6',label=r'single trials',rasterized=True)
      for i in range(size):
-          plt.plot(freqs,P_trial[i],'-',lw=0.5, zorder = 1, color='0.6')
+          plt.plot(freqs,P_trial[i],'-',lw=0.5, zorder = 1, color='0.6',rasterized=True)
      plt.plot(freqs,P          ,   'k', lw=2, zorder = 3,            label=r'empirical trial average')
      plt.plot(freqs,P+P_sd     ,   'k--', lw=1, zorder = 3,          label=r'empirical trial average $\pm$ s.d.')
      plt.plot(freqs,P-P_sd     ,   'k--', lw=1, zorder = 3)         
-     plt.plot(freqs_theo,P_theo,   'r', lw=3, zorder = 2, alpha=0.6, label=r'theoretical expectation')
-     plt.plot(freqs_theo,P_theo + P_theo_sd,'r--', lw=1, zorder = 2, alpha=0.6, label=r'theoretical expectation $\pm$ s.d. (Welch)')
-     plt.plot(freqs_theo,P_theo - P_theo_sd,'r--', lw=1, zorder = 2, alpha=0.6)          
+     plt.plot(freqs_theo,P_theo,   'g', lw=3, zorder = 2, alpha=0.6, label=r'theoretical expectation')
+     plt.plot(freqs_theo,P_theo + P_theo_sd,'g--', lw=1, zorder = 2, alpha=0.6, label=r'theoretical expectation $\pm$ s.d. (Welch)')
+     plt.plot(freqs_theo,P_theo - P_theo_sd,'g--', lw=1, zorder = 2, alpha=0.6)          
      plt.legend(loc=1)
      plt.xlabel(r'frequency $f$ (Hz)')
      plt.ylabel(r'spike-train PSD (1/s)')
@@ -456,9 +451,9 @@ def example():
 
      plt.subplot(313)
      plt.plot(freqs_c,P_c,         'k', lw=2, zorder = 2,            label=r'empirical')
-     plt.plot(freqs_theo,P_c_theo, 'r', lw=3, zorder = 1, alpha=0.6, label=r'theoretical expectation')
-     plt.plot(freqs_theo,P_c_theo + P_c_theo_sd,'r--', lw=1, zorder = 1, alpha=0.6, label=r'theoretical expectation $\pm$ s.d. (Welch)')
-     plt.plot(freqs_theo,P_c_theo - P_c_theo_sd,'r--', lw=1, zorder = 1, alpha=0.6)          
+     plt.plot(freqs_theo,P_c_theo, 'g', lw=3, zorder = 1, alpha=0.6, label=r'theoretical expectation')
+     plt.plot(freqs_theo,P_c_theo + P_c_theo_sd,'g--', lw=1, zorder = 1, alpha=0.6, label=r'theoretical expectation $\pm$ s.d. (Welch)')
+     plt.plot(freqs_theo,P_c_theo - P_c_theo_sd,'g--', lw=1, zorder = 1, alpha=0.6)          
      plt.legend(loc=1)
      plt.xlabel(r'frequency $f$ (Hz)')
      plt.ylabel(r'spike-train PSD (1/s)')
