@@ -283,7 +283,7 @@ def psd_gamma_process_theoretical(freqs,rate,order):
 def psd_sd_theoretical_welch(P,T,windowlength):
      '''
      Theoretical standard deviation of the spectrum of a stochastic
-     process estimated by the Welch method with non-overlapping segments.
+     process estimated by the Welch method.
 
      The standard deviation SD of the spectrum of some stochastic process 
      is identical to its expectation P(f) (for sufficiently large frequencies f>>1/T; 
@@ -292,7 +292,10 @@ def psd_sd_theoretical_welch(P,T,windowlength):
 
                   SD(f) = P(f) / sqrt(N)
    
-     For non-overlappig segments, N=T/windowlength.
+     Here, it is assumed that the segments of length windowlength overlap by 
+     windowlength/2 (default in scipy.signal.welch()). Hence,
+
+     N=2*T/windowlength.
 
      [1] Cox, D. R., & Lewis, P. A. (1966). The statistical analysis of series of events. 
          Springer Dordrecht
@@ -319,7 +322,7 @@ def psd_sd_theoretical_welch(P,T,windowlength):
 
      '''
      
-     P_sd = P / numpy.sqrt(T/windowlength)
+     P_sd = P / numpy.sqrt(2*T/windowlength)
      
      return P_sd
 
