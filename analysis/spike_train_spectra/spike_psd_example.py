@@ -282,11 +282,11 @@ def psd_gamma_process_theoretical(freqs,rate,order):
 ###########################################################################################
 def psd_sd_theoretical_welch(P,T,windowlength):
      '''
-     Theoretical standard deviation of the point process spectrum
-     estimated by the Welch method with non-overlapping segments.
+     Theoretical standard deviation of the spectrum of a stochastic
+     process estimated by the Welch method with non-overlapping segments.
 
-     The standard deviation SD of a stochastic process spectrum 
-     is identical to its expectation P(f) (for sufficiently large frequencies f; 
+     The standard deviation SD of the spectrum of some stochastic process 
+     is identical to its expectation P(f) (for sufficiently large frequencies f>>1/T; 
      see [1], or eq. (12.46) in [2]). Using the Welch method, this error is reduced 
      by averaging across N segments. The total error is hence given by 
 
