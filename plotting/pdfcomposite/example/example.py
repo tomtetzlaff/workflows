@@ -115,19 +115,25 @@ def some_matplotlib_figure():
 
 ######################################################################
 
-## create a matplotlib master figure and save as pdf (and eps)
-# (this figure defines the layout of the final composite figure)
-master_file_name, fig_size =  some_matplotlib_figure()
+'''
+Step 1: Create a (matplotlib) master figure and save it as pdf.
+        This figure defines the layout of the final composite figure,
+        including its size.
+'''
+master_figure_name, fig_size =  some_matplotlib_figure()
 
-## name (root) of resulting composite figure
-composite_figure_name_root = 'composite_example'
+'''
+Step 2: Specify the names of the external pdf figures to be included, 
+        and their positions in the final composite figure.
+'''
+ext_figure_names      = [ 'inkscape_sketch.pdf', 'inkscape_sketch.pdf' ] ## list of figures to be included (here, we use the same figure twice)
+ext_figures_positions = [ (-3.7,2.5)           , (3.7,2.5)     ] ## positions of external figures in composite figure (center = (0,0))
 
-## name of external pdf file
-ext_file_name = 'inkscape_sketch.pdf'  ## here: created using inkscape
-#os.system('inkscape %s.pdf --export-eps=%s.eps' % (ext_file_name,ext_file_name))  ## convert to eps
-
-ext_file_names  = [ ext_file_name, ext_file_name ] ## list of figures to be included
-pos_ext_figures = [ (-3.7,2.5)   , (3.7,2.5)     ] ## positions of external figures in composite figure (center = (0,0))
-
-## generate composite figure (with dimensions inherited from the master figure)
-pdfcomposite.create(composite_figure_name_root,fig_size,master_file_name,ext_file_names,pos_ext_figures)
+'''
+Step 3: Create the final compposite figure.
+'''
+pdfcomposite.create('composite_example',
+                    fig_size,
+                    master_figure_name,
+                    ext_figure_names,
+                    ext_figures_positions)

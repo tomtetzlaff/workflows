@@ -12,9 +12,9 @@ Notes:
 
 i) On purpose, the method proposed here does not implement any rescaling of the involved figures (though this would be easy). This enforces a clean workflow where all figure components are prepared in exactly the size (figure dimensions, font sizes, etc) needed for the final figure.
 
-ii) The positions of the external figures within the composite figure need to be specified by the user by setting pos_ext_figures in create(). 
+ii) The positions of the external figures within the composite figure need to be specified by the user by setting ext_figures_positions in create(). 
 
-iii) For the master figure, a repositionig is not needed (and not implemented here): as the maser figure defines the overall layout of the final composite figure, the composite figure inherits figure dimensions from the master figure. The master figure is therefore positioned at the center of the composite figure.
+iii) For the master figure, a repositionig is not needed (and not implemented here): as the master figure defines the overall layout of the final composite figure, the composite figure inherits figure dimensions from the master figure. The master figure is therefore positioned at the center of the composite figure.
 
 
 (Tom Tetzlaff, t.tetzlaff@fz-juelich.de, 2020, 2024)
@@ -23,9 +23,10 @@ iii) For the master figure, a repositionig is not needed (and not implemented he
 import os
 
 #####################################
-def create(composite_figure_name_root, fig_size, master_file_name, ext_file_names, pos_ext_figures, draw_grid = False):
+def create(composite_figure_name_root, fig_size, master_figure_name, ext_figure_names, ext_figures_positions, draw_grid = False):    
     '''
-    Creates a composite figure composed of a master figure and a set of external figures, all of them availabe as pdf files. The resulting file is saved in pdf format.
+    Creates a composite figure composed of a master figure and a set of external figures, 
+    all of them availabe as pdf files. The resulting file is saved in pdf format.
 
     Arguments:
     ----------
@@ -35,17 +36,18 @@ def create(composite_figure_name_root, fig_size, master_file_name, ext_file_name
     fig_size:                   tuple
                                 Dimensions (width, height) of the composite figure (in inch)
 
-    master_file_name:           str
-                                File name of master figure
+    master_figure_name:         str
+                                Name of master figure pdf file (including extension ".pdf")
 
-    ext_file_names:             list(str)
-                                List of file names of external figures
+    ext_figure_names:           list(str)
+                                List of file names of external figures (including extensions ".pdf")
 
-    pos_ext_figure:             list(tuple)
-                                List of position of external figure within the composite figure (the master figure is always centered at position (0,0)).
+    ext_figures_positions:      list(tuple)
+                                List of position of external figure within the composite figure 
+                                (the master figure is always centered at position (0,0))
 
     draw_grid:                  bool
-                                if True: draws some grid lines to assist positioning of external figure
+                                If True: draws some grid lines to assist positioning of external figures
 
     Returns:
     --------
@@ -53,8 +55,8 @@ def create(composite_figure_name_root, fig_size, master_file_name, ext_file_name
 
     '''
 
-    assert(master_file_name[-4:]=='.pdf')
-    assert(len(ext_file_names)==len(pos_ext_figures))
+    assert(master_figure_name[-4:]=='.pdf')
+    assert(len(ext_figure_names)==len(ext_figures_positions))
     
     file = open('%s.tex' % composite_figure_name_root , 'w')
     file.write(r"\documentclass{article}")
@@ -79,18 +81,16 @@ def create(composite_figure_name_root, fig_size, master_file_name, ext_file_name
     file.write("\n")
     file.write(r"    \node[inner sep=-1pt] (matplotlib_figure) at (0,0)")
     file.write("\n")
-    file.write(r"    {\includegraphics{%s}};" % (master_file_name))
-    #file.write(r"    {\includegraphics{%s.pdf}};" % (master_file_name))    
+    file.write(r"    {\includegraphics{%s}};" % (master_figure_name))
     file.write("\n")
 
     ## include external figures
-    for i,ext_file_name in enumerate(ext_file_names):
-        assert(ext_file_name[-4:]=='.pdf')
+    for i,ext_figure_name in enumerate(ext_figure_names):
+        assert(ext_figure_name[-4:]=='.pdf')
         
-        file.write(r"    \node[inner sep=-1pt,rectangle] (%s) at (%.4f,%.4f)" % (ext_file_name, pos_ext_figures[i][0], pos_ext_figures[i][1]))
+        file.write(r"    \node[inner sep=-1pt,rectangle] (%s) at (%.4f,%.4f)" % (ext_figure_name, ext_figures_positions[i][0], ext_figures_positions[i][1]))
         file.write("\n")
-        file.write(r"    {\includegraphics{%s}};" % (ext_file_name))
-        #file.write(r"    {\includegraphics{%s.pdf}};" % (ext_file_name))        
+        file.write(r"    {\includegraphics{%s}};" % (ext_figure_name))
         file.write("\n")
 
     ## draw grid
