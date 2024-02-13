@@ -10,14 +10,21 @@ The method is based on LaTeX and TikZ.
 Notes:
 ------
 
-i) On purpose, the method proposed here does not implement any rescaling of the involved figures (though this would be easy). This enforces a clean workflow where all figure components are prepared in exactly the size (figure dimensions, font sizes, etc) needed for the final figure.
+i)   On purpose, the method proposed here does not implement any rescaling of the 
+     involved figures (though this would be easy). This enforces a clean workflow 
+     where all figure components are prepared in exactly the size (figure dimensions, 
+     font sizes, etc) needed for the final figure.
 
-ii) The positions of the external figures within the composite figure need to be specified by the user by setting ext_figures_positions in create(). 
+ii)  The positions of the external figures within the composite figure need to be 
+     specified by the user by setting ext_figures_positions in create(). 
 
-iii) For the master figure, a repositionig is not needed (and not implemented here): as the master figure defines the overall layout of the final composite figure, the composite figure inherits figure dimensions from the master figure. The master figure is therefore positioned at the center of the composite figure.
-
+iii) For the master figure, a repositionig is not needed (and not implemented here): 
+     as the master figure defines the overall layout of the final composite figure, 
+     the composite figure inherits figure dimensions from the master figure. The master 
+     figure is therefore positioned at the center of the composite figure.
 
 (Tom Tetzlaff, t.tetzlaff@fz-juelich.de, 2020, 2024)
+
 '''
 
 import os
