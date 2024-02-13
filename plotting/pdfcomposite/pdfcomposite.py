@@ -1,5 +1,5 @@
 '''
-Generating a composite figure from several pdf figures:
+Generating a composite figure from
 
 1) a master pdf figure defining the overall layout (size, panel positions, etc), and 
 

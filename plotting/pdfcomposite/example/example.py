@@ -1,20 +1,6 @@
 '''
-Example illustrating how to create a composite pdf figure (vector graphics) from a set of individual pdf figures:
-
-1) a master figure (here: a matplotlib figure) defining the overall layout (size, panel positions, etc), and 
-
-2) two external figures (here: a sketch made using inkscape).
-
-The method is based on LaTeX and TikZ.
-
-Notes:
-------
-
-i) On purpose, the method proposed here does not implement any rescaling of the involved figures (though this would be easy). This enforces a clean workflow where all figure components are prepared in exactly the size (figure dimensions, font sizes, etc) needed for the final figure.
-
-ii) The positions of the external figures within the composite figure need to be specified by the user by setting pos_ext_figures in create_composite_figure(). 
-
-iii) For the master figure, a repositionig is not needed (and not implemented here): as the maser figure defines the overall layout of the final composite figure, the composite figure inherits figure dimensions from the master figure. The master figure is therefore positioned at the center of the composite figure.
+Example illustrating how to create a composite pdf figure from a maser figure generated using matplotlib,
+and an external pdf figure (created with inkscape).
 
 (Tom Tetzlaff, t.tetzlaff@fz-juelich.de, 2020, 2024)
 
@@ -114,26 +100,31 @@ def some_matplotlib_figure():
     return fname, fig_size
 
 ######################################################################
+def example():
+    '''
+    Step 1: Create a (matplotlib) master figure and save it as pdf.
+            This figure defines the layout of the final composite figure,
+            including its size.
+    '''
+    master_figure_name, fig_size =  some_matplotlib_figure()
 
-'''
-Step 1: Create a (matplotlib) master figure and save it as pdf.
-        This figure defines the layout of the final composite figure,
-        including its size.
-'''
-master_figure_name, fig_size =  some_matplotlib_figure()
+    '''
+    Step 2: Specify the names of the external pdf figures to be included, 
+            and their positions in the final composite figure.
+    '''
+    ext_figure_names      = [ 'inkscape_sketch.pdf', 'inkscape_sketch.pdf' ] ## list of figures to be included (here, we use the same figure twice)
+    ext_figures_positions = [ (-3.7,2.5)           , (3.7,2.5)     ] ## positions of external figures in composite figure (center = (0,0))
 
-'''
-Step 2: Specify the names of the external pdf figures to be included, 
-        and their positions in the final composite figure.
-'''
-ext_figure_names      = [ 'inkscape_sketch.pdf', 'inkscape_sketch.pdf' ] ## list of figures to be included (here, we use the same figure twice)
-ext_figures_positions = [ (-3.7,2.5)           , (3.7,2.5)     ] ## positions of external figures in composite figure (center = (0,0))
+    '''
+    Step 3: Create the final compposite figure.
+    '''
+    pdfcomposite.create('composite_example',
+                        fig_size,
+                        master_figure_name,
+                        ext_figure_names,
+                        ext_figures_positions)
 
-'''
-Step 3: Create the final compposite figure.
-'''
-pdfcomposite.create('composite_example',
-                    fig_size,
-                    master_figure_name,
-                    ext_figure_names,
-                    ext_figures_positions)
+######################################################################
+if __name__ == '__main__':
+    example()
+
