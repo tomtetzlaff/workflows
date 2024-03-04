@@ -81,16 +81,20 @@ def some_matplotlib_figure():
 
     ## panel C
     plt.subplot(gs[1,0])
-    plt.plot(np.random.randn(200),lw=1,color='k')
+    plt.plot(0.2*np.random.randn(200),lw=1,color='k')
     plt.xlabel(r'time $t$ (ms)')
     plt.ylabel(r'activity $x_\mathsf{E}(t)$')
+    plt.xlim(0,200)
+    plt.ylim(-2.5,2.5)
     panel_label('C',panel_label_pos)
 
     ## panel D
     plt.subplot(gs[1,1])
     plt.plot(np.random.randn(200),lw=1,color='k')
     plt.xlabel(r'time $t$ (ms)')
-    plt.ylabel(r'activity $x_\mathsf{I}(t)$')
+    plt.ylabel(r'activity $x_\mathsf{E}(t)$')
+    plt.xlim(0,200)    
+    plt.ylim(-2.5,2.5)    
     panel_label('D',panel_label_pos)
 
     fname = 'matplotlib_figure.pdf'
