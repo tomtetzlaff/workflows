@@ -7,7 +7,8 @@ all: \
 
 composite_example.pdf: \
 	example.py \
-	inkscape_sketch.pdf
+	network_sketch_1.pdf \
+	network_sketch_2.pdf \
 
 	python example.py
 

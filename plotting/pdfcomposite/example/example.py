@@ -1,6 +1,6 @@
 '''
-Example illustrating how to create a composite pdf figure from a maser figure 
-generated using matplotlib, and an external pdf figure (created with inkscape).
+Example illustrating how to create a composite pdf figure from a master figure 
+generated using matplotlib, and two external pdf figures (created with inkscape).
 
 (Tom Tetzlaff, t.tetzlaff@fz-juelich.de, 2020, 2024)
 
@@ -115,8 +115,12 @@ def example():
     Step 2: Specify the names of the external pdf figures to be included, 
             and their positions in the final composite figure.
     '''
-    ext_figure_names      = [ 'inkscape_sketch.pdf', 'inkscape_sketch.pdf' ] ## list of figures to be included (here, we use the same figure twice)
-    ext_figures_positions = [ (-3.7,2.5)           , (3.7,2.5)     ] ## positions of external figures in composite figure (center = (0,0))
+    
+    ## list of external figures to be included
+    ext_figure_names      = [ 'network_sketch_1.pdf', 'network_sketch_2.pdf' ] 
+
+    ## positions of external figures in composite figure (center = (0,0))
+    ext_figures_positions = [ (-3.7,2.5)           , (4.0,2.5)     ] 
 
     ##########
     '''
