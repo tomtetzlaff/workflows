@@ -10,10 +10,10 @@ The method is based on LaTeX and TikZ.
 Notes:
 ------
 
-i)   On purpose, the method proposed here does not implement any rescaling of the 
-     involved figures (though this would be easy). This enforces a clean workflow 
-     where all figure components are prepared in exactly the size (figure dimensions, 
-     font sizes, etc) needed for the final figure.
+i)   The method proposed here implements an optional rescaling of the 
+     involved figures (see `ext_figures_resize_factors`). In practice, such rescaling
+     is not recmommended. To guarantee consistent dimensions of figure components (font sizes,
+     line widths, etc), all subfigures should be prepared with exactly the size needed for the final figure.
 
 ii)  The positions of the external figures within the composite figure need to be 
      specified by the user by setting ext_figures_positions in create(). 
@@ -30,7 +30,7 @@ iii) For the master figure, a repositionig is not needed (and not implemented he
 import os
 
 #####################################
-def create(composite_figure_name_root, fig_size, master_figure_name, ext_figure_names, ext_figures_positions, draw_grid = False):    
+def create(composite_figure_name_root, fig_size, master_figure_name, ext_figure_names, ext_figures_positions, draw_grid = False, ext_figures_resize_factors = []):    
     '''
     Creates a composite figure composed of a master figure and a set of external figures, 
     all of them availabe as pdf files. The resulting file is saved in pdf format.
@@ -55,6 +55,9 @@ def create(composite_figure_name_root, fig_size, master_figure_name, ext_figure_
 
     draw_grid:                  bool
                                 If True: draws some grid lines to assist positioning of external figures
+
+    ext_figures_resize_factors: list(float)
+                                (Optional) resizing factors for each external figure.
 
     Returns:
     --------
@@ -91,13 +94,23 @@ def create(composite_figure_name_root, fig_size, master_figure_name, ext_figure_
     file.write(r"    {\includegraphics{%s}};" % (master_figure_name))
     file.write("\n")
 
+    if len(ext_figures_resize_factors)>0:
+        resize = True
+    else:
+        resize = False
+
     ## include external figures
     for i,ext_figure_name in enumerate(ext_figure_names):
         assert(ext_figure_name[-4:]=='.pdf')
+        if resize:
+            scale = ext_figures_resize_factors[i]
+        else:
+            scale = 1.0
         
         file.write(r"    \node[inner sep=-1pt,rectangle] (%s) at (%.4f,%.4f)" % (ext_figure_name, ext_figures_positions[i][0], ext_figures_positions[i][1]))
         file.write("\n")
-        file.write(r"    {\includegraphics{%s}};" % (ext_figure_name))
+        #file.write(r"    {\includegraphics{%s}};" % (ext_figure_name))
+        file.write(r"    {\includegraphics[scale=%.3f]{%s}};" % (scale, ext_figure_name))        
         file.write("\n")
 
     ## draw grid

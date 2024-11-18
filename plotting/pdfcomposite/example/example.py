@@ -134,7 +134,9 @@ def example():
                         fig_size,
                         master_figure_name,
                         ext_figure_names,
-                        ext_figures_positions)
+                        ext_figures_positions,
+                        ext_figures_resize_factors = [1.,0.8]
+                        )
 
 ######################################################################
 if __name__ == '__main__':
