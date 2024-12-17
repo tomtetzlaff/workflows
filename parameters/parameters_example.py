@@ -1,5 +1,5 @@
 '''
-Simple example illustrating the use if the parameter toolbox.
+Simple example illustrating the use of the parameter toolbox.
 
 See https://pypi.org/project/parameters for detailed information.
 
@@ -65,5 +65,5 @@ print(P)
 print()
 print('List of parameter sets:')
 for par in PL:
-    print(par) ## alternatively, here one could submit jobs for all parameter combinations defined in the parameter space
+    print(par) ## at this point, one could for example submit jobs to some queuing system for each parameter combinations defined in the parameter space
 print()
