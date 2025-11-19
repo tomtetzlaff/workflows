@@ -1,0 +1,24 @@
+{
+    "thalamic_input": false,
+    "th_start": 700.0,
+    "th_duration": 10.0,
+    "th_rate": 120.0,
+    "num_th_neurons": 902,
+    "conn_probs_th": [
+        0.0,
+        0.0,
+        0.0983,
+        0.0619,
+        0.0,
+        0.0,
+        0.0512,
+        0.0196
+    ],
+    "PSP_th": 0.15,
+    "delay_th_mean": 1.5,
+    "delay_th_rel_std": 0.5,
+    "dc_transient": false,
+    "dc_transient_start": 650.0,
+    "dc_transient_dur": 100.0,
+    "dc_transient_amp": 0.3
+}

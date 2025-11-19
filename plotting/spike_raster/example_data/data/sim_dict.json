@@ -1,0 +1,15 @@
+{
+    "t_presim": 500.0,
+    "t_sim": 10000.0,
+    "sim_resolution": 0.1,
+    "rec_dev": [
+        "spike_recorder"
+    ],
+    "data_path": "data/",
+    "rng_seed": 12345,
+    "local_num_threads": 4,
+    "rec_V_int": 1.0,
+    "overwrite_files": true,
+    "print_time": true,
+    "store_metadata": true
+}
