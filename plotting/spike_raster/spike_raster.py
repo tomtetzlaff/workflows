@@ -54,16 +54,21 @@ def spike_raster_dense(times, senders, ax, T, markersize = 1, clim = (0.6,0.), d
         The time bins corresponding to the rate estimation.    
     """
 
-    ## calculate spike densities
+    ## calculate spike densitiesusing kernel density estimation
     ## (takes very long)
     # from scipy.stats import gaussian_kde
     # xy = np.vstack([times, senders])
     # z = gaussian_kde(xy)(xy)
 
-    #z,_=np.histogram2d(times, senders, bins=10)
-    #print(type(z))
-    #print(z)
-    #stop
+    ## calculate spike densities using 2d histogram
+    # N = len(np.unique(senders))
+    # dN = 20
+    # time_bins = np.arange(0, T+dt, dt)
+    # sender_bins = np.arange(0,N+dN,dN)
+    # spike_count = np.histogram2d(times, senders, bins=[time_bins, sender_bins])[0]
+    # times_idx = np.digitize(times, time_bins)
+    # senders_idx = np.digitize(senders, sender_bins)
+    # z = spike_count[times_idx-1, senders_idx-2]
     
     ## calculate instantaneous rate
     print("calculating population rate...")
@@ -230,7 +235,7 @@ def spike_raster(rate_coding):
     '''
 
     ## plotting parameters
-    markersize = 1       ## size of the markers in the scatter plot
+    markersize = 1 #0.1       ## size of the markers in the scatter plot
     clim = (0.6,0.)      ## colors (grayscale) representing minimum and maximum rate
     dt = 1               ## bin size (in ms) for rate estimation
 
@@ -243,8 +248,9 @@ def spike_raster(rate_coding):
 
     ######################################
     print('loading spike data...')
-    T = 10000. ## (ms)        
-    #T = 5000. ## (ms)    
+    #T = 10000. ## (ms)        
+    #T = 5000. ## (ms)
+    T = 2000. ## (ms)        
     t_warmup = 500. ## (ms)
 
     import json
@@ -324,6 +330,7 @@ def spike_raster(rate_coding):
     os.system('mkdir -p figures')
     if rate_coding:
         fname_root = 'spike_raster_rate_coded'
+        #fname_root = 'spike_raster_2dhist'        
     else:
         fname_root = 'spike_raster_black'
 
